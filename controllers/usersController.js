@@ -32,7 +32,15 @@ exports.getUser = async (req, res, next) => {
     const user = await User.findById(id);
     // .select('-password');
     if (!user) throw new createError.NotFound();
-    res.status(200).send(user);
+    if (req.canSeeFullUser) res.status(200).send(user);
+    else {
+      const reducedUser = {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        services: user.services,
+      };
+      res.status(200).send(reducedUser);
+    }
   } catch (err) {
     next(err);
   }
