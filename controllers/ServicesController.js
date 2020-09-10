@@ -33,7 +33,35 @@ const getService = async (req, res, next) => {
     next(err);
   }
 };
+const updateService = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) throw new createError.NotFound();
+    const updatedService = await Service.findByIdAndUpdate(id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!updatedService) throw new createError.NotFound();
+    res.status(200).send(updatedService);
+  } catch (err) {
+    next(err);
+  }
+};
+
+const deleteService = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) throw new createError.NotFound();
+    const deletedService = await Record.findByIdAndRemove(id);
+    if (!deletedService) throw new createError.NotFound();
+    res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+};
 
 exports.getServices = getServices;
 exports.addService = addService;
 exports.getService = getService;
+exports.updateService = updateService;
+exports.deleteService = deleteService;

@@ -6,6 +6,8 @@ const {
   getServices,
   addService,
   getService,
+  updateService,
+  deleteService,
 } = require("../controllers/ServicesController");
 /* const validator = require("../middleware/validator");
 const authorizeToken = require("../middleware/tokenAuth");
@@ -13,10 +15,14 @@ const authorizeAdmin = require("../middleware/adminAuth");
 const recordRules = require("../lib/validation/record"); */
 
 router.route("/").get(getServices).post(addService);
-/* .post(authorizeToken, authorizeAdmin, validator(recordRules), addService); */
+/* .post(authorizeToken, authorizeAdmin, validator(serviceRules), addService); */
 
-router.route("/:id").get(getService);
-/* .put(authorizeToken, authorizeAdmin, validator(recordRules), updateRecord)
-  .delete(authorizeToken, authorizeAdmin, deleteRecord); */
+router
+  .route("/:id")
+  .get(getService)
+  .put(
+    /* authorizeToken, authorizeAdmin, validator(recordRules), */ updateService
+  )
+  .delete(/* authorizeToken, authorizeAdmin,  */ deleteService);
 
 module.exports = router;
