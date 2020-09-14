@@ -34,9 +34,17 @@ const UserSchema = new Schema(
     },
     role: {
       type: String,
-      enum: ["user", "admin", "serviceProvider"],
+      enum: ["user", "admin"],
       required: true,
       default: "user",
+    },
+    availability: {
+      startDate: {
+        type: Date,
+      },
+      endDate: {
+        type: Date,
+      },
     },
     services: [
       {
@@ -70,6 +78,19 @@ UserSchema.pre("save", async function (next) {
   this.password = await encrypt(this.password);
   // ...And move on
   next();
+});
+
+UserSchema.pre("save", async function (next) {
+  /* if (
+    this.services.length === 0 &&
+    (!this.availability.startDate || !this.availability.endDate)
+  ) */
+  if (
+    this.services.length > 0 &&
+    !(this.availability.startDate || this.availability.endDate)
+  )
+    next(new Error("Please fill availability fields"));
+  else next();
 });
 
 // Workaround for findByIdAndUpdate beause no "save" or "update" event is triggered there

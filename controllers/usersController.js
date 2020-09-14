@@ -17,7 +17,7 @@ exports.getUsers = async (req, res, next) => {
 exports.addUser = async (req, res, next) => {
   try {
     // const newUser = new User(req.body);
-    const newUser = new User({ ...req.body });
+    const newUser = new User({ ...req.body, role: "user" });
     await newUser.save();
     res.status(201).send(newUser);
   } catch (err) {
@@ -32,23 +32,47 @@ exports.getUser = async (req, res, next) => {
     const user = await User.findById(id);
     // .select('-password');
     if (!user) throw new createError.NotFound();
-    res.status(200).send(user);
+    if (req.canSeeFullUser) res.status(200).send(user);
+    else {
+      const reducedUser = {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        services: user.services,
+      };
+      res.status(200).send(reducedUser);
+    }
   } catch (err) {
     next(err);
   }
 };
 
-exports.updateUser = async (req, res, next) => {
+/* exports.updateUser = async (req, res, next) => {
   try {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) throw new createError.NotFound();
     const updated = await User.findByIdAndUpdate(
       id,
-      { ...req.body, role: "user" },
+      { ...req.body },
       { new: true, runValidators: true }
     );
     if (!updated) throw new createError.NotFound();
     res.status(200).send(updated);
+  } catch (err) {
+    next(err);
+  }
+}; */
+exports.updateUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) throw new createError.NotFound();
+    const found = await User.findById(id);
+    if (!found) throw new createError.NotFound();
+    for (const key in req.body) {
+      found[key] = req.body[key];
+    }
+    found.role = "user";
+    found.save();
+    res.status(200).send(found);
   } catch (err) {
     next(err);
   }
@@ -79,7 +103,7 @@ exports.loginUser = async (req, res, next) => {
     // Since password match, create a JWT token and save it with the user
     const token = await loginUser.generateAuthToken();
     // Send the token to the client so they can access protected routes
-    res.header("X-Auth-Token", token).status(200).send(loginUser);
+    res.cookie("X-Auth-Token", token).status(200).send(loginUser);
   } catch (err) {
     next(err);
   }
