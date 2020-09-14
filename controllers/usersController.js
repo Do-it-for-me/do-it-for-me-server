@@ -17,7 +17,7 @@ exports.getUsers = async (req, res, next) => {
 exports.addUser = async (req, res, next) => {
   try {
     // const newUser = new User(req.body);
-    const newUser = new User({ ...req.body });
+    const newUser = new User({ ...req.body, role: "user" });
     await newUser.save();
     res.status(201).send(newUser);
   } catch (err) {
@@ -46,17 +46,33 @@ exports.getUser = async (req, res, next) => {
   }
 };
 
-exports.updateUser = async (req, res, next) => {
+/* exports.updateUser = async (req, res, next) => {
   try {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) throw new createError.NotFound();
     const updated = await User.findByIdAndUpdate(
       id,
-      { ...req.body, role: "user" },
+      { ...req.body },
       { new: true, runValidators: true }
     );
     if (!updated) throw new createError.NotFound();
     res.status(200).send(updated);
+  } catch (err) {
+    next(err);
+  }
+}; */
+exports.updateUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) throw new createError.NotFound();
+    const found = await User.findById(id);
+    if (!found) throw new createError.NotFound();
+    for (const key in req.body) {
+      found[key] = req.body[key];
+    }
+    found.role = "user";
+    found.save();
+    res.status(200).send(found);
   } catch (err) {
     next(err);
   }
