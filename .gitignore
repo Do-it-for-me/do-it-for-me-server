@@ -64,5 +64,5 @@ typings/
 .next
 
 #environment variables
-config/environment.js
+
 .vercel
