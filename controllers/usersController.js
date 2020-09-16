@@ -102,7 +102,17 @@ exports.loginUser = async (req, res, next) => {
     // Since password match, create a JWT token and save it with the user
     const token = await loginUser.generateAuthToken();
     // Send the token to the client so they can access protected routes
-    res.cookie("X-Auth-Token", token).status(200).send(loginUser);
+    res.cookie("loggedIn", true, {
+      expires: new Date(Date.now() + 604800000),
+      httpOnly: false,
+    });
+    res
+      .cookie("X-Auth-Token", token, {
+        expires: new Date(Date.now() + 604800000),
+        httpOnly: true,
+      })
+      .status(200)
+      .send(loginUser);
   } catch (err) {
     next(err);
   }
