@@ -1,5 +1,14 @@
 const express = require("express");
 const router = express.Router();
+const multer = require("multer");
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: "public/uploads/",
+    filename: function (req, file, cb) {
+      cb(null, Date.now() + file.originalname);
+    },
+  }),
+});
 
 const {
   getUsers,
@@ -8,6 +17,7 @@ const {
   updateUser,
   deleteUser,
   loginUser,
+  userImage,
 } = require("../controllers/usersController");
 const validator = require("../middleware/validator");
 const authorizeToken = require("../middleware/tokenAuth");
@@ -23,6 +33,7 @@ router.route("/").get(/* authorizeToken, authorizeAdmin, */ getUsers);
 router.route("/signup").post(validator(userRules), addUser);
 
 router.post("/login", loginUser);
+router.post("/:id/userImage", upload.single("userImage"), userImage);
 
 router
   .route("/:id")

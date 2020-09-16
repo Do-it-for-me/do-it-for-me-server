@@ -46,21 +46,20 @@ exports.getUser = async (req, res, next) => {
   }
 };
 
-/* exports.updateUser = async (req, res, next) => {
+exports.userImage = async (req, res, next) => {
   try {
+    console.log(req.file);
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) throw new createError.NotFound();
-    const updated = await User.findByIdAndUpdate(
-      id,
-      { ...req.body },
-      { new: true, runValidators: true }
-    );
+    const imagePath = req.file.path;
+    const updated = await User.findByIdAndUpdate(id, { image: imagePath });
     if (!updated) throw new createError.NotFound();
+
     res.status(200).send(updated);
   } catch (err) {
     next(err);
   }
-}; */
+};
 exports.updateUser = async (req, res, next) => {
   try {
     const { id } = req.params;
