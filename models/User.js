@@ -38,6 +38,9 @@ const UserSchema = new Schema(
       required: true,
       default: "user",
     },
+    image: {
+      type: String,
+    },
     availability: {
       startDate: {
         type: Date,
