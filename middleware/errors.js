@@ -1,19 +1,39 @@
-const createError = require('http-errors');
+const createError = require("http-errors");
 
 exports.throw400 = (req, res, next) => {
-    // We create an error and attach the status code
-    // const error = new Error('No such resource');
-    // error.status = 400;
-    const error = new createError.BadRequest();
-    // We next() the error so the error handler middleware runs
-    next(error);
-}
+  // We create an error and attach the status code
+  // const error = new Error('No such resource');
+  // error.status = 400;
+  const error = new createError.BadRequest();
+  // We next() the error so the error handler middleware runs
+  next(error);
+};
 
 exports.handleErrors = (err, req, res, next) => {
-    res.status(err.status || 500).send({
-        error: {
-            message: err.message,
-            details: err.validator || null
-        }
-    });
-}
+  if (err.code === 11000) {
+    err.status = 400;
+    err.message = "Email is already registered";
+    err.validator = [
+      {
+        field: "email",
+        message: err.message,
+      },
+    ];
+  } else if (err.code === 15000) {
+    err.status = 400;
+    err.message = "Please add availability dates";
+    err.validator = [
+      {
+        field: "availability",
+        message: err.message,
+      },
+    ];
+  }
+  res.status(err.status || 500).send({
+    error: {
+      code: err.code,
+      message: err.message,
+      details: err.validator || null,
+    },
+  });
+};
