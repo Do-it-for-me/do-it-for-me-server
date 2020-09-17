@@ -91,9 +91,11 @@ UserSchema.pre("save", async function (next) {
   if (
     this.services.length > 0 &&
     !(this.availability.startDate || this.availability.endDate)
-  )
-    next(new Error("Please fill availability fields"));
-  else next();
+  ) {
+    const error = new Error("Please fill availability fields");
+    error.code = 15000;
+    next(error);
+  } else next();
 });
 
 // Workaround for findByIdAndUpdate beause no "save" or "update" event is triggered there

@@ -21,6 +21,8 @@ exports.addUser = async (req, res, next) => {
     await newUser.save();
     res.status(201).send(newUser);
   } catch (err) {
+    if (err.code === 11000) console.log("it works");
+    console.log(err);
     next(err);
   }
 };
