@@ -2,16 +2,17 @@ const mongoose = require("mongoose");
 const createError = require("http-errors");
 
 const User = require("../models/User");
-const { check } = require("../lib/encryption");
+/* const { check } = require("../lib/encryption"); */
 
 exports.getUsers = async (req, res, next) => {
-  const queryObject = {
-    "address.city": req.body.address.city,
-    services: req.body.services,
+  const search = {
+    "address.city": req.query.city || null,
+    services: req.query.services || { $exists: true, $not: { $size: 0 } },
+    price: req.query.price || null,
+    rate: req.query.rate || null,
   };
   try {
-    const users = await User.find().populate("services");
-    // .select('-password');
+    const users = await User.find(search).populate("services");
     res.status(200).send(users);
   } catch (err) {
     next(err);
