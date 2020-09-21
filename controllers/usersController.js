@@ -5,6 +5,10 @@ const User = require("../models/User");
 const { check } = require("../lib/encryption");
 
 exports.getUsers = async (req, res, next) => {
+  const queryObject = {
+    "address.city": req.body.address.city,
+    services: req.body.services,
+  };
   try {
     const users = await User.find().populate("services");
     // .select('-password');
