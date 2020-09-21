@@ -55,6 +55,15 @@ const UserSchema = new Schema(
         ref: "Service",
       },
     ],
+    price: {
+      type: Number,
+    },
+    bio: {
+      type: String,
+    },
+    rate: {
+      type: Number,
+    },
   },
   {
     toJSON: {
@@ -121,6 +130,9 @@ UserSchema.method("toJSON", function () {
     fullName: this.fullName,
     services: this.services,
     availability: this.availability,
+    price: this.price,
+    rate: this.rate,
+    bio: this.bio,
   };
 });
 
