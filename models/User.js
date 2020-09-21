@@ -119,6 +119,8 @@ UserSchema.method("toJSON", function () {
     email: this.email,
     address: this.address,
     fullName: this.fullName,
+    services: this.services,
+    availability: this.availability,
   };
 });
 

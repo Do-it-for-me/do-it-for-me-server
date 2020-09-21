@@ -6,7 +6,7 @@ const { check } = require("../lib/encryption");
 
 exports.getUsers = async (req, res, next) => {
   try {
-    const users = await User.find();
+    const users = await User.find().populate("services");
     // .select('-password');
     res.status(200).send(users);
   } catch (err) {
@@ -19,6 +19,7 @@ exports.addUser = async (req, res, next) => {
     // const newUser = new User(req.body);
     const newUser = new User({ ...req.body, role: "user" });
     await newUser.save();
+    console.log("newUser", newUser);
     res.status(201).send(newUser);
   } catch (err) {
     if (err.code === 11000) console.log("it works");
