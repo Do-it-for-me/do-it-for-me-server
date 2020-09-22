@@ -13,7 +13,10 @@ exports.getUsers = async (req, res, next) => {
   if (req.query.rate) queryObject.rate = req.query.rate; */
   const search = {
     "address.city":
-      req.query.city.replace(/(?:^|\s|[-"'([{])+\S/g, (c) => c.toUpperCase()) ||
+      (req.query.city &&
+        req.query.city.replace(/(?:^|\s|[-"'([{])+\S/g, (c) =>
+          c.toUpperCase()
+        )) ||
       null,
     services: req.query.services || { $exists: true, $not: { $size: 0 } },
     price: req.query.price || null,
