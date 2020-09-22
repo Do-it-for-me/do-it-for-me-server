@@ -1,6 +1,6 @@
 const { Schema, model } = require("mongoose");
 
-const Address = require("./Address");
+//const Address = require("./Address");
 
 const { encrypt, check } = require("../lib/encryption");
 const { sign, verify } = require("../lib/authentication");
@@ -28,8 +28,16 @@ const UserSchema = new Schema(
       type: String,
       required: true,
     },
-    address: {
-      type: Address,
+    street: {
+      type: String,
+      required: true,
+    },
+    city: {
+      type: String,
+      required: true,
+    },
+    zip: {
+      type: String,
       required: true,
     },
     role: {
@@ -126,6 +134,9 @@ UserSchema.method("toJSON", function () {
     firstName: this.firstName,
     lastName: this.lastName,
     email: this.email,
+    city: this.city,
+    zip: this.zip,
+    street: this.street,
     address: this.address,
     fullName: this.fullName,
     services: this.services,
