@@ -38,17 +38,21 @@ exports.addUser = async (req, res, next) => {
     await newUser.save();
     const token = await newUser.generateAuthToken();
     console.log("newUser", newUser);
-    res.cookie("loggedIn", true, {
-      expires: new Date(Date.now() + 604800000),
-      httpOnly: false,
-    });
-    res
-      .cookie("X-Auth-Token", token, {
+    const addedUser = await User.find({ email: req.body.email });
+    console.log("addedUser", addedUser);
+    if (addedUser) {
+      res.cookie("loggedIn", true, {
         expires: new Date(Date.now() + 604800000),
-        httpOnly: true,
-      })
-      .status(201)
-      .send(newUser);
+        httpOnly: false,
+      });
+      res
+        .cookie("X-Auth-Token", token, {
+          expires: new Date(Date.now() + 604800000),
+          httpOnly: true,
+        })
+        .status(201)
+        .send(newUser);
+    }
   } catch (err) {
     if (err.code === 11000) console.log("it works");
     console.log(err);
