@@ -36,8 +36,19 @@ exports.addUser = async (req, res, next) => {
     // const newUser = new User(req.body);
     const newUser = new User({ ...req.body, role: "user" });
     await newUser.save();
+    const token = await newUser.generateAuthToken();
     console.log("newUser", newUser);
-    res.status(201).send(newUser);
+    res.cookie("loggedIn", true, {
+      expires: new Date(Date.now() + 604800000),
+      httpOnly: false,
+    });
+    res
+      .cookie("X-Auth-Token", token, {
+        expires: new Date(Date.now() + 604800000),
+        httpOnly: true,
+      })
+      .status(201)
+      .send(newUser);
   } catch (err) {
     if (err.code === 11000) console.log("it works");
     console.log(err);
