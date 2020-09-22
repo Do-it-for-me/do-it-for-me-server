@@ -12,7 +12,7 @@ exports.getUsers = async (req, res, next) => {
   if (req.query.price) queryObject.price = req.query.price;
   if (req.query.rate) queryObject.rate = req.query.rate; */
   const search = {
-    "address.city":
+    city:
       (req.query.city &&
         req.query.city.replace(/(?:^|\s|[-"'([{])+\S/g, (c) =>
           c.toUpperCase()
