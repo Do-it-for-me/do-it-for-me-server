@@ -33,11 +33,9 @@ const Order = require("../models/Order");
           lastName: faker.name.lastName(),
           email: faker.internet.email(),
           password: faker.internet.password(),
-          address: {
-            street: faker.address.streetAddress(),
-            city: faker.address.city(),
-            zip: faker.address.zipCode(),
-          },
+          street: faker.address.streetAddress(),
+          city: faker.address.city(),
+          zip: faker.address.zipCode(),
         })
     );
 

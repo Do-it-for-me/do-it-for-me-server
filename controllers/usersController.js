@@ -5,12 +5,24 @@ const User = require("../models/User");
 /* const { check } = require("../lib/encryption"); */
 
 exports.getUsers = async (req, res, next) => {
+  /*   const queryObject = {};
+  if (req.query.city) queryObject["address.city"] = req.query.city;
+  if (req.query.services || { $exists: true, $not: { $size: 0 } })
+    queryObject.services = req.query.services;
+  if (req.query.price) queryObject.price = req.query.price;
+  if (req.query.rate) queryObject.rate = req.query.rate; */
   const search = {
-    "address.city": req.query.city || null,
+    city:
+      (req.query.city &&
+        req.query.city.replace(/(?:^|\s|[-"'([{])+\S/g, (c) =>
+          c.toUpperCase()
+        )) ||
+      null,
     services: req.query.services || { $exists: true, $not: { $size: 0 } },
     price: req.query.price || null,
     rate: req.query.rate || null,
   };
+  console.log(search);
   try {
     const users = await User.find(search).populate("services");
     res.status(200).send(users);
