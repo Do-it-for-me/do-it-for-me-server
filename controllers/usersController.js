@@ -11,15 +11,17 @@ exports.getUsers = async (req, res, next) => {
     queryObject.services = req.query.services;
   if (req.query.price) queryObject.price = req.query.price;
   if (req.query.rate) queryObject.rate = req.query.rate; */
-  /*   const search = {
-    "address.city": req.query.city || null,
+  const search = {
+    "address.city":
+      req.query.city.replace(/(?:^|\s|[-"'([{])+\S/g, (c) => c.toUpperCase()) ||
+      null,
     services: req.query.services || { $exists: true, $not: { $size: 0 } },
     price: req.query.price || null,
     rate: req.query.rate || null,
-  }; */
-  console.log(req.query);
+  };
+  console.log(search);
   try {
-    const users = await User.find(req.query).populate("services");
+    const users = await User.find(search).populate("services");
     res.status(200).send(users);
   } catch (err) {
     next(err);
