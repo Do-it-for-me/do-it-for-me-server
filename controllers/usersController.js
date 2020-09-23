@@ -149,10 +149,16 @@ exports.loginUser = async (req, res, next) => {
     // Check if user with the given email exists
     const loginUser = await User.findOne({ email });
     // If email doesn't exist, throw an error
-    if (!loginUser) throw new createError.Unauthorized();
+    if (!loginUser)
+      throw new createError.Unauthorized(
+        "Your email or password was incorrect! Please try again"
+      );
     const isAuthenticated = await loginUser.authenticate(password);
     // If password doesn't match, throw an error
-    if (!isAuthenticated) throw new createError.Unauthorized();
+    if (!isAuthenticated)
+      throw new createError.Unauthorized(
+        "Your email or password was incorrect! Please try again"
+      );
     // Since password match, create a JWT token and save it with the user
     const token = await loginUser.generateAuthToken();
     // Send the token to the client so they can access protected routes
