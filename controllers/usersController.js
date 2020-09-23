@@ -37,7 +37,7 @@ exports.addUser = async (req, res, next) => {
     const newUser = new User({ ...req.body, role: "user" });
     await newUser.save();
     const token = await newUser.generateAuthToken();
-    console.log("newUser", newUser);
+    /* console.log("newUser", newUser);
     const addedUser = await User.find({ email: req.body.email });
     console.log("addedUser", addedUser);
     if (addedUser) {
@@ -52,7 +52,26 @@ exports.addUser = async (req, res, next) => {
         })
         .status(201)
         .send(newUser);
-    }
+    } */
+    res
+      .cookie("loggedIn", true, {
+        expires: new Date(Date.now() + 604800000),
+        httpOnly: false,
+        "Access-Control-Allow-Origin":
+          process.env.NODE_ENV === "production"
+            ? "https://doitforme.com"
+            : "http://localhost:3001",
+      })
+      .cookie("X-Auth-Token", token, {
+        expires: new Date(Date.now() + 604800000),
+        httpOnly: true,
+        "Access-Control-Allow-Origin":
+          process.env.NODE_ENV === "production"
+            ? "https://doitforme.com"
+            : "http://localhost:3001",
+      })
+      .status(201)
+      .send(newUser);
   } catch (err) {
     if (err.code === 11000) console.log("it works");
     console.log(err);
@@ -130,10 +149,16 @@ exports.loginUser = async (req, res, next) => {
     // Check if user with the given email exists
     const loginUser = await User.findOne({ email });
     // If email doesn't exist, throw an error
-    if (!loginUser) throw new createError.Unauthorized();
+    if (!loginUser)
+      throw new createError.Unauthorized(
+        "Your email or password was incorrect! Please try again"
+      );
     const isAuthenticated = await loginUser.authenticate(password);
     // If password doesn't match, throw an error
-    if (!isAuthenticated) throw new createError.Unauthorized();
+    if (!isAuthenticated)
+      throw new createError.Unauthorized(
+        "Your email or password was incorrect! Please try again"
+      );
     // Since password match, create a JWT token and save it with the user
     const token = await loginUser.generateAuthToken();
     // Send the token to the client so they can access protected routes
