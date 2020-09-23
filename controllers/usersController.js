@@ -37,7 +37,7 @@ exports.addUser = async (req, res, next) => {
     const newUser = new User({ ...req.body, role: "user" });
     await newUser.save();
     const token = await newUser.generateAuthToken();
-    console.log("newUser", newUser);
+    /* console.log("newUser", newUser);
     const addedUser = await User.find({ email: req.body.email });
     console.log("addedUser", addedUser);
     if (addedUser) {
@@ -52,7 +52,26 @@ exports.addUser = async (req, res, next) => {
         })
         .status(201)
         .send(newUser);
-    }
+    } */
+    res
+      .cookie("loggedIn", true, {
+        expires: new Date(Date.now() + 604800000),
+        httpOnly: false,
+        "Access-Control-Allow-Origin":
+          process.env.NODE_ENV === "production"
+            ? "https://doitforme.com"
+            : "http://localhost:3001",
+      })
+      .cookie("X-Auth-Token", token, {
+        expires: new Date(Date.now() + 604800000),
+        httpOnly: true,
+        "Access-Control-Allow-Origin":
+          process.env.NODE_ENV === "production"
+            ? "https://doitforme.com"
+            : "http://localhost:3001",
+      })
+      .status(201)
+      .send(newUser);
   } catch (err) {
     if (err.code === 11000) console.log("it works");
     console.log(err);
