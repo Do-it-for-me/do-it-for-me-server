@@ -5,26 +5,29 @@ const User = require("../models/User");
 /* const { check } = require("../lib/encryption"); */
 
 exports.getUsers = async (req, res, next) => {
-  /*   const queryObject = {};
-  if (req.query.city) queryObject["address.city"] = req.query.city;
-  if (req.query.services || { $exists: true, $not: { $size: 0 } })
-    queryObject.services = req.query.services;
+  const queryObject = {};
+  if (req.query.city)
+    queryObject.city = req.query.city.replace(/(?:^|\s|[-"'([{])+\S/g, (c) =>
+      c.toUpperCase()
+    );
+  if (req.query.services) queryObject.services = req.query.services;
+  else queryObject.services = { $exists: true, $not: { $size: 0 } };
   if (req.query.price) queryObject.price = req.query.price;
-  if (req.query.rate) queryObject.rate = req.query.rate; */
-  const search = {
+  if (req.query.rate) queryObject.rate = req.query.rate;
+  /* const search = {
     city:
       (req.query.city &&
         req.query.city.replace(/(?:^|\s|[-"'([{])+\S/g, (c) =>
           c.toUpperCase()
         )) ||
-      null,
+      "Berlin",
     services: req.query.services || { $exists: true, $not: { $size: 0 } },
     price: req.query.price || null,
     rate: req.query.rate || null,
   };
-  console.log(search);
+  console.log(search); */
   try {
-    const users = await User.find(search).populate("services");
+    const users = await User.find(queryObject).populate("services");
     res.status(200).send(users);
   } catch (err) {
     next(err);
