@@ -1,31 +1,35 @@
 const mongoose = require("mongoose");
 const createError = require("http-errors");
+const moment = require("moment");
 
 const User = require("../models/User");
 /* const { check } = require("../lib/encryption"); */
 
 exports.getUsers = async (req, res, next) => {
-  const queryObject = {};
+  const queryObject = {
+    /* availability: {} */
+  };
   if (req.query.city)
     queryObject.city = req.query.city.replace(/(?:^|\s|[-"'([{])+\S/g, (c) =>
       c.toUpperCase()
     );
   if (req.query.services) queryObject.services = req.query.services;
   else queryObject.services = { $exists: true, $not: { $size: 0 } };
-  if (req.query.price) queryObject.price = req.query.price;
-  if (req.query.rate) queryObject.rate = req.query.rate;
-  /* const search = {
-    city:
-      (req.query.city &&
-        req.query.city.replace(/(?:^|\s|[-"'([{])+\S/g, (c) =>
-          c.toUpperCase()
-        )) ||
-      "Berlin",
-    services: req.query.services || { $exists: true, $not: { $size: 0 } },
-    price: req.query.price || null,
-    rate: req.query.rate || null,
-  };
-  console.log(search); */
+  if (req.query.price)
+    queryObject.price = {
+      $lte: req.query.price,
+    };
+  if (req.query.rate)
+    queryObject.rate = {
+      $gte: req.query.rate,
+    };
+  let queryDate = moment(req.query.date).format("YYYY-MM-DD");
+  if (req.query.date) {
+    queryObject["availability.startDate"] = {
+      $lte: queryDate,
+    };
+  }
+  queryObject["availability.endDate"] = { $gte: queryDate };
   try {
     const users = await User.find(queryObject).populate("services");
     res.status(200).send(users);
@@ -88,6 +92,7 @@ exports.getUser = async (req, res, next) => {
     if (!mongoose.Types.ObjectId.isValid(id)) throw new createError.NotFound();
     const user = await User.findById(id);
     // .select('-password');
+    console.log(typeof user.availability.startDate);
     if (!user) throw new createError.NotFound();
     if (req.canSeeFullUser) res.status(200).send(user);
     else {
@@ -180,3 +185,16 @@ exports.loginUser = async (req, res, next) => {
     next(err);
   }
 };
+
+/* const search = {
+    city:
+      (req.query.city &&
+        req.query.city.replace(/(?:^|\s|[-"'([{])+\S/g, (c) =>
+          c.toUpperCase()
+        )) ||
+      "Berlin",
+    services: req.query.services || { $exists: true, $not: { $size: 0 } },
+    price: req.query.price || null,
+    rate: req.query.rate || null,
+  };
+  console.log(search); */
