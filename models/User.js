@@ -144,6 +144,7 @@ UserSchema.method("toJSON", function () {
     price: this.price,
     rate: this.rate,
     bio: this.bio,
+    image: this.image,
   };
 });
 

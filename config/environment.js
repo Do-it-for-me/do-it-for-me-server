@@ -8,10 +8,12 @@ const sharedConfig = {
   // WIll be production when running on remote Express server, because NODE_ENV will be defined then
   env: process.env.NODE_ENV || "development",
   jwt_secret: "JAYzLlDAG3MMe3npgUSk9Yj0g91p5b9UAOc6kUOEN4a13aBGW21QeSMladRav3T",
+  imageBaseURL: "http://localhost:3000/uploads/",
 };
 
 const devConfig = {
   db: "mongodb://127.0.0.1:27017/do-it-for-me",
+  absolutePath: "http://localhost:3000/",
 };
 
 const prodConfig = {

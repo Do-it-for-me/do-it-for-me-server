@@ -11,6 +11,7 @@ const authorizeToken = async (req, res, next) => {
     // If not, throw Error
     if (!user) throw new createError.Unauthorized();
     // Else attach user to request for further authentication, then next();
+    console.log(user);
     req.user = user;
     next();
   } catch (err) {

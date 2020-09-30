@@ -4,7 +4,8 @@ const moment = require("moment");
 
 const User = require("../models/User");
 /* const { check } = require("../lib/encryption"); */
-
+const config = require("../config/environment");
+console.log("config", config);
 exports.getUsers = async (req, res, next) => {
   const queryObject = {
     /* availability: {} */
@@ -90,7 +91,7 @@ exports.getUser = async (req, res, next) => {
   try {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) throw new createError.NotFound();
-    const user = await User.findById(id);
+    const user = await User.findById(id).populate("services");
     // .select('-password');
     console.log(typeof user.availability.startDate);
     if (!user) throw new createError.NotFound();
@@ -113,7 +114,8 @@ exports.userImage = async (req, res, next) => {
     console.log(req.file);
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) throw new createError.NotFound();
-    const imagePath = req.file.path;
+    const imagePath = `${config.imageBaseURL}${req.file.filename}`;
+    console.log("PATH", imagePath);
     const updated = await User.findByIdAndUpdate(id, { image: imagePath });
     if (!updated) throw new createError.NotFound();
 
