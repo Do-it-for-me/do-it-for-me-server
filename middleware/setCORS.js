@@ -1,6 +1,7 @@
 module.exports = (req, res, next) => {
   // Add a header to the response
   res.set({
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE , OPTIONS",
     "Access-Control-Allow-Origin":
       process.env.NODE_ENV === "production"
         ? "https://doitforme.com"
