@@ -69,9 +69,13 @@ const UserSchema = new Schema(
     bio: {
       type: String,
     },
-    rate: {
+    totalRate: {
       type: Number,
     },
+    rateCounter: {
+      type: Number,
+    },
+    //newRate = 5 + rate X rateCounter / rateCounter + 1
   },
   {
     toJSON: {
@@ -85,6 +89,9 @@ const UserSchema = new Schema(
 
 UserSchema.virtual("fullName").get(function () {
   return `${this.firstName} ${this.lastName}`;
+});
+UserSchema.virtual("rate").get(function () {
+  return Math.round(this.totalRate / this.rateCounter) / 2;
 });
 
 // Automatically hash the provided clear-text password before a User is saved
@@ -143,6 +150,7 @@ UserSchema.method("toJSON", function () {
     availability: this.availability,
     price: this.price,
     rate: this.rate,
+    rateCounter: this.rateCounter,
     bio: this.bio,
     image: this.image,
   };

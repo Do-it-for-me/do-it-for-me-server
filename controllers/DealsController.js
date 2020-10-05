@@ -56,10 +56,8 @@ exports.confirmDeal = async (req, res, next) => {
     if (String(checkConfirmedDeal.provider) !== String(req.user._id)) {
       throw new createError("You only can confirm the deals you provide");
     } else if (checkConfirmedDeal.canceled) {
-      throw new createError("Deal is already canceled");
+      throw new createError("Deal has been canceled");
     } else {
-      /* checkConfirmedDeal.approved = true;
-      checkConfirmedDeal.save(); */
       const confirmDeal = await Deal.findByIdAndUpdate(
         dealId,
         {
@@ -80,31 +78,20 @@ exports.cancelDeal = async (req, res, next) => {
     const checkCancelDeal = await Deal.findById(dealId);
     if (checkCancelDeal.canceled)
       throw new createError("Deal is already canceled");
-
-    if (String(checkCancelDeal.searcher) === String(req.user._id)) {
-      if (checkCancelDeal.approved)
-        throw new createError("Deal is already approved");
-      else {
-        const cancelDeal = await Deal.findByIdAndUpdate(
-          dealId,
-          { canceled: true },
-          { new: true }
-        );
-        res.status(200).send(cancelDeal);
-      }
-    } else if (String(checkCancelDeal.provider) === String(req.user._id)) {
-      if (checkCancelDeal.approved)
-        throw new createError("You cannot cancel an already approved deal");
-      else {
-        const cancelDeal = await Deal.findByIdAndUpdate(
-          dealId,
-          { canceled: true },
-          { new: true }
-        );
-        res.status(200).send(cancelDeal);
-      }
-    } else {
+    if (checkCancelDeal.approved)
+      throw new createError("Deal is already approved");
+    if (
+      String(checkCancelDeal.searcher) !== String(req.user._id) &&
+      String(checkCancelDeal.provider) !== String(req.user._id)
+    )
       throw new createError("You can't cancel a deal you aren't a part of");
+    else {
+      const cancelDeal = await Deal.findByIdAndUpdate(
+        dealId,
+        { canceled: true },
+        { new: true }
+      );
+      res.status(200).send(cancelDeal);
     }
   } catch (err) {
     next(err);

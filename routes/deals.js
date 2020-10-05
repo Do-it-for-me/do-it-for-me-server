@@ -16,8 +16,7 @@ const validator = require("../middleware/validator");
 router.route("/").get(authorizeToken, getDeals);
 router.route("/").post(authorizeToken, addDeal);
 
-router.route("/:id").put(authorizeToken, confirmDeal); //to be created for confirming the deal
-/* .delete(authorizeToken, deleteDeal); */
+router.route("/:id/confirm").put(authorizeToken, confirmDeal);
 
 router.route("/:id/cancel").put(authorizeToken, cancelDeal);
 
