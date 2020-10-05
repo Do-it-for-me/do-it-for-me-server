@@ -18,6 +18,7 @@ const {
   deleteUser,
   loginUser,
   userImage,
+  rateProvider,
 } = require("../controllers/usersController");
 const validator = require("../middleware/validator");
 const authorizeToken = require("../middleware/tokenAuth");
@@ -42,4 +43,5 @@ router
   .put(authorizeToken, authorizeUser, validator(putUserRules), updateUser)
   .delete(authorizeToken, authorizeUser, deleteUser);
 
+router.route("/:id/rate").put(authorizeToken, rateProvider);
 module.exports = router;

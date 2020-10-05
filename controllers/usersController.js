@@ -5,7 +5,6 @@ const moment = require("moment");
 const User = require("../models/User");
 /* const { check } = require("../lib/encryption"); */
 const config = require("../config/environment");
-console.log("config", config);
 exports.getUsers = async (req, res, next) => {
   const queryObject = {
     /* availability: {} */
@@ -200,3 +199,20 @@ exports.loginUser = async (req, res, next) => {
     rate: req.query.rate || null,
   };
   console.log(search); */
+
+exports.rateProvider = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) throw new createError.NotFound();
+    const found = await User.findById(id);
+    if (!found) throw new createError.NotFound();
+    for (const key in req.body) {
+      found[key] = req.body[key];
+    }
+    found.role = "user";
+    found.save();
+    res.status(200).send(found);
+  } catch (err) {
+    next(err);
+  }
+};

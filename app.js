@@ -9,6 +9,7 @@ const mongoose = require("mongoose");
 const indexRouter = require("./routes/index");
 const servicesRouter = require("./routes/service");
 const usersRouter = require("./routes/users");
+const dealsRouter = require("./routes/deals");
 
 const setCORS = require("./middleware/setCORS");
 const { throw400, handleErrors } = require("./middleware/errors");
@@ -42,6 +43,7 @@ app.use(setCORS);
 app.use("/", indexRouter);
 app.use("/api/services", servicesRouter);
 app.use("/api/users", usersRouter);
+app.use("/api/deals", dealsRouter);
 
 // Throw a 400 if no route is matched
 app.use(throw400);
