@@ -204,8 +204,6 @@ exports.loginUser = async (req, res, next) => {
 exports.rateProvider = async (req, res, next) => {
   try {
     const ratedUserId = req.params.id;
-    /* if (!mongoose.Types.ObjectId.isValid(ratedUserId))
-      throw new createError.NotFound("Please log in"); */
     const ratedUser = await User.findById(ratedUserId);
     const dealId = req.body.dealId;
     const deal = await Deal.findById(dealId);
@@ -217,16 +215,25 @@ exports.rateProvider = async (req, res, next) => {
       throw new createError("You are not part of this deal");
     if (String(deal.provider) !== String(ratedUserId))
       throw new createError(
-        "You can't rate a person you didn't have a deal with"
+        "You can't rate a service provider you didn't have a deal with"
       );
     if (moment(dealDate) >= moment(todayDate))
       throw new createError(
-        "You can't rate a person before the deal is already done"
+        "You can't rate a service provider before the deal is already done"
       );
     if (deal.canceled)
-      throw new createError("You can't rate a person for a canceled deal");
+      throw new createError(
+        "You can't rate a service provider for a canceled deal"
+      );
     if (!deal.approved)
-      throw new createError("You can't rate a person for an unconfirmed deal");
+      throw new createError(
+        "You can't rate a service provider for an unconfirmed deal"
+      );
+    if (deal.rated)
+      throw new createError(
+        "You already rated this service provider for this deal"
+      );
+    await Deal.findByIdAndUpdate(dealId, { rated: true });
 
     const userAfterRate = await User.findByIdAndUpdate(
       ratedUserId,
@@ -237,15 +244,7 @@ exports.rateProvider = async (req, res, next) => {
       { new: true }
     );
 
-    res.send(userAfterRate);
-
-    /* if (!found) throw new createError.NotFound();
-    for (const key in req.body) {
-      found[key] = req.body[key];
-    }
-    found.role = "user";
-    found.save();
-    res.status(200).send(found); */
+    res.status(200).send(userAfterRate);
   } catch (err) {
     next(err);
   }
