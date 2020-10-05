@@ -31,6 +31,10 @@ const DealSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  rated: {
+    type: Boolean,
+    default: false,
+  },
   time: {
     type: Array,
     required: true,
