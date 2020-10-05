@@ -4,8 +4,8 @@ const moment = require("moment");
 
 const User = require("../models/User");
 /* const { check } = require("../lib/encryption"); */
+const Deal = require("../models/Deal");
 const config = require("../config/environment");
-console.log("config", config);
 exports.getUsers = async (req, res, next) => {
   const queryObject = {
     /* availability: {} */
@@ -200,3 +200,53 @@ exports.loginUser = async (req, res, next) => {
     rate: req.query.rate || null,
   };
   console.log(search); */
+
+exports.rateProvider = async (req, res, next) => {
+  try {
+    const ratedUserId = req.params.id;
+    /* if (!mongoose.Types.ObjectId.isValid(ratedUserId))
+      throw new createError.NotFound("Please log in"); */
+    const ratedUser = await User.findById(ratedUserId);
+    const dealId = req.body.dealId;
+    const deal = await Deal.findById(dealId);
+    const dealDate = moment(deal.dealDate).format("YYYY-MM-DD");
+    const todayDate = moment().format("YYYY-MM-DD");
+    const newRate = req.body.rate * 2;
+    console.log(dealDate, todayDate);
+    if (String(deal.searcher) !== String(req.user._id))
+      throw new createError("You are not part of this deal");
+    if (String(deal.provider) !== String(ratedUserId))
+      throw new createError(
+        "You can't rate a person you didn't have a deal with"
+      );
+    if (moment(dealDate) >= moment(todayDate))
+      throw new createError(
+        "You can't rate a person before the deal is already done"
+      );
+    if (deal.canceled)
+      throw new createError("You can't rate a person for a canceled deal");
+    if (!deal.approved)
+      throw new createError("You can't rate a person for an unconfirmed deal");
+
+    const userAfterRate = await User.findByIdAndUpdate(
+      ratedUserId,
+      {
+        totalRate: Number(ratedUser.totalRate) + Number(newRate),
+        rateCounter: ratedUser.rateCounter + 1,
+      },
+      { new: true }
+    );
+
+    res.send(userAfterRate);
+
+    /* if (!found) throw new createError.NotFound();
+    for (const key in req.body) {
+      found[key] = req.body[key];
+    }
+    found.role = "user";
+    found.save();
+    res.status(200).send(found); */
+  } catch (err) {
+    next(err);
+  }
+};
