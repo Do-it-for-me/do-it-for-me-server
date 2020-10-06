@@ -7,8 +7,8 @@ const config = require("../config/environment");
 const { check } = require("../lib/encryption");
 
 exports.getDeals = async (req, res, next) => {
-  let deals = { searcher: undefined, provider: undefined };
-  deals["searcher"] = await Deal.find({ searcher: req.user._id })
+  let deals = { searcherList: undefined, providerList: undefined };
+  deals["searcherList"] = await Deal.find({ searcher: req.user._id })
     .populate(
       "searcher",
       "-email -city -street -zip -services -availability -bio"
@@ -19,7 +19,7 @@ exports.getDeals = async (req, res, next) => {
     )
     .populate("dealService");
 
-  deals["provider"] = await Deal.find({ provider: req.user._id })
+  deals["providerList"] = await Deal.find({ provider: req.user._id })
     .populate(
       "searcher",
       "-email -city -street -zip -services -availability -bio"
