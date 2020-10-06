@@ -55,6 +55,7 @@ DealSchema.method("toJSON", function () {
     canceled: this.canceled,
     time: this.time,
     note: this.note,
+    rated: this.rated,
   };
 });
 

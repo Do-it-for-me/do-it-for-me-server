@@ -91,7 +91,7 @@ UserSchema.virtual("fullName").get(function () {
   return `${this.firstName} ${this.lastName}`;
 });
 UserSchema.virtual("rate").get(function () {
-  return Math.round(this.totalRate / this.rateCounter) / 2;
+  return Math.round(this.totalRate / this.rateCounter) / 2 || 0;
 });
 
 // Automatically hash the provided clear-text password before a User is saved

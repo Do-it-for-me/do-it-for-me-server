@@ -6,6 +6,7 @@ const User = require("../models/User");
 /* const { check } = require("../lib/encryption"); */
 const Deal = require("../models/Deal");
 const config = require("../config/environment");
+
 exports.getUsers = async (req, res, next) => {
   const queryObject = {
     /* availability: {} */
@@ -209,8 +210,8 @@ exports.rateProvider = async (req, res, next) => {
     const deal = await Deal.findById(dealId);
     const dealDate = moment(deal.dealDate).format("YYYY-MM-DD");
     const todayDate = moment().format("YYYY-MM-DD");
-    const newRate = req.body.rate * 2;
-    console.log(dealDate, todayDate);
+    const newRate = Number(req.body.rate) * 2;
+    console.log("newRate", newRate);
     if (String(deal.searcher) !== String(req.user._id))
       throw new createError("You are not part of this deal");
     if (String(deal.provider) !== String(ratedUserId))
@@ -234,7 +235,7 @@ exports.rateProvider = async (req, res, next) => {
         "You already rated this service provider for this deal"
       );
     await Deal.findByIdAndUpdate(dealId, { rated: true });
-
+    console.log("totalRate", totalRate);
     const userAfterRate = await User.findByIdAndUpdate(
       ratedUserId,
       {
