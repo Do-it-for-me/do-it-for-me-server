@@ -74,8 +74,8 @@ const UserSchema = new Schema(
     },
     rateCounter: {
       type: Number,
+      default: 0,
     },
-    //newRate = 5 + rate X rateCounter / rateCounter + 1
   },
   {
     toJSON: {
