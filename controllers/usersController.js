@@ -80,7 +80,8 @@ exports.addUser = async (req, res, next) => {
             : "http://localhost:3001",
       })
       .status(201)
-      .send(newUser);
+      .send(newUser)
+      .populate("services");
   } catch (err) {
     if (err.code === 11000) console.log("it works");
     console.log(err);
@@ -129,7 +130,7 @@ exports.updateUser = async (req, res, next) => {
   try {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) throw new createError.NotFound();
-    const found = await User.findById(id);
+    const found = await User.findById(id).populate("services");
     if (!found) throw new createError.NotFound();
     for (const key in req.body) {
       found[key] = req.body[key];
@@ -158,7 +159,7 @@ exports.loginUser = async (req, res, next) => {
   const { email, password } = req.body;
   try {
     // Check if user with the given email exists
-    const loginUser = await User.findOne({ email });
+    const loginUser = await User.findOne({ email }).populate("services");
     // If email doesn't exist, throw an error
     if (!loginUser)
       throw new createError.Unauthorized(
