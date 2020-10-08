@@ -19,11 +19,11 @@ exports.getUsers = async (req, res, next) => {
   else queryObject.services = { $exists: true, $not: { $size: 0 } };
   if (req.query.price)
     queryObject.price = {
-      $lte: req.query.price,
+      $lte: Number(req.query.price),
     };
   if (req.query.rate)
     queryObject.rate = {
-      $gte: req.query.rate,
+      $gte: Number(req.query.rate),
     };
   let queryDate = moment(req.query.date).format("YYYY-MM-DD");
   if (req.query.date) {
@@ -95,7 +95,7 @@ exports.getUser = async (req, res, next) => {
     if (!mongoose.Types.ObjectId.isValid(id)) throw new createError.NotFound();
     const user = await User.findById(id).populate("services");
     // .select('-password');
-    console.log(typeof user.availability.startDate);
+
     if (!user) throw new createError.NotFound();
     if (req.canSeeFullUser) res.status(200).send(user);
     else {
@@ -113,11 +113,9 @@ exports.getUser = async (req, res, next) => {
 
 exports.userImage = async (req, res, next) => {
   try {
-    console.log(req.file);
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) throw new createError.NotFound();
     const imagePath = `${config.imageBaseURL}${req.file.filename}`;
-    console.log("PATH", imagePath);
     const updated = await User.findByIdAndUpdate(id, { image: imagePath });
     if (!updated) throw new createError.NotFound();
 
@@ -207,12 +205,13 @@ exports.rateProvider = async (req, res, next) => {
   try {
     const ratedUserId = req.params.id;
     const ratedUser = await User.findById(ratedUserId);
+    const ratedUserTotalRate = Number(ratedUser.totalRate) || 0;
     const dealId = req.body.dealId;
     const deal = await Deal.findById(dealId);
     const dealDate = moment(deal.dealDate).format("YYYY-MM-DD");
     const todayDate = moment().format("YYYY-MM-DD");
     const newRate = Number(req.body.rate) * 2;
-    console.log("newRate", newRate);
+    console.log("ratedUserTotalRate", ratedUserTotalRate);
     if (String(deal.searcher) !== String(req.user._id))
       throw new createError("You are not part of this deal");
     if (String(deal.provider) !== String(ratedUserId))
@@ -236,11 +235,11 @@ exports.rateProvider = async (req, res, next) => {
         "You already rated this service provider for this deal"
       );
     await Deal.findByIdAndUpdate(dealId, { rated: true });
-    console.log("totalRate", totalRate);
+
     const userAfterRate = await User.findByIdAndUpdate(
       ratedUserId,
       {
-        totalRate: Number(ratedUser.totalRate) + Number(newRate),
+        totalRate: ratedUserTotalRate + Number(newRate),
         rateCounter: ratedUser.rateCounter + 1,
       },
       { new: true }

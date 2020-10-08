@@ -65,6 +65,7 @@ const UserSchema = new Schema(
     ],
     price: {
       type: Number,
+      default: 0,
     },
     bio: {
       type: String,
@@ -151,6 +152,7 @@ UserSchema.method("toJSON", function () {
     price: this.price,
     rate: this.rate,
     rateCounter: this.rateCounter,
+    totalRate: this.totalRate,
     bio: this.bio,
     image: this.image,
   };
