@@ -29,13 +29,15 @@ exports.getDeals = async (req, res, next) => {
       "-email -city -street -zip -services -availability -bio"
     )
     .populate("dealService");
-  console.log(deals);
+
   res.status(200).send(deals);
 };
 
 exports.addDeal = async (req, res, next) => {
   try {
     // const newUser = new User(req.body);
+    if (String(req.user._id) === String(req.body.provider))
+      throw new createError("You can not book yourself");
     const newDeal = new Deal({ ...req.body, searcher: req.user._id });
     /* if (req.user._id !== req.body.searcher)
       throw new createError.NotAcceptable(
