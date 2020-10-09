@@ -135,7 +135,8 @@ exports.updateUser = async (req, res, next) => {
     }
     found.role = "user";
     found.save();
-    res.status(200).send(found);
+    const user = await User.findById(id).populate("services");
+    res.status(200).send(user);
   } catch (err) {
     next(err);
   }
