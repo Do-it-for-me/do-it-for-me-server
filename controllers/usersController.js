@@ -11,6 +11,7 @@ exports.getUsers = async (req, res, next) => {
   const queryObject = {
     /* availability: {} */
   };
+
   if (req.query.city)
     queryObject.city = req.query.city.replace(/(?:^|\s|[-"'([{])+\S/g, (c) =>
       c.toUpperCase()
@@ -21,10 +22,12 @@ exports.getUsers = async (req, res, next) => {
     queryObject.price = {
       $lte: Number(req.query.price),
     };
-  if (req.query.rate)
-    queryObject.rate = {
-      $gte: Number(req.query.rate),
+  if (req.query.rate) {
+    const queryRate = Number(req.query.rate);
+    queryObject["rate"] = {
+      $gte: queryRate,
     };
+  }
   let queryDate = moment(req.query.date).format("YYYY-MM-DD");
   if (req.query.date) {
     queryObject["availability.startDate"] = {
@@ -34,6 +37,7 @@ exports.getUsers = async (req, res, next) => {
   queryObject["availability.endDate"] = { $gte: queryDate };
   try {
     const users = await User.find(queryObject).populate("services");
+    console.log(queryObject);
     res.status(200).send(users);
   } catch (err) {
     next(err);
@@ -237,15 +241,19 @@ exports.rateProvider = async (req, res, next) => {
       );
     await Deal.findByIdAndUpdate(dealId, { rated: true });
 
-        const newCalculatedRate = Math.round((Number(ratedUserTotalRate + Number(newRate)) / (Number(ratedUser.rateCounter + 1)) / 2)) || 0;
-
+    const newCalculatedRate =
+      Math.round(
+        Number(ratedUserTotalRate + Number(newRate)) /
+          Number(ratedUser.rateCounter + 1) /
+          2
+      ) || 0;
 
     const userAfterRate = await User.findByIdAndUpdate(
       ratedUserId,
       {
         totalRate: ratedUserTotalRate + Number(newRate),
         rateCounter: ratedUser.rateCounter + 1,
-        rate: newCalculatedRate
+        rate: newCalculatedRate,
       },
       { new: true }
     );
