@@ -74,6 +74,28 @@ exports.confirmDeal = async (req, res, next) => {
   }
 };
 
+exports.getDealChat = async (req, res, next) => {
+  try {
+    const dealId = req.params.id;
+    const deal = await Deal.findById(dealId);
+    if (!deal)  throw new createError("Deal is not found");
+      res.status(200).send(deal.chat);
+  } catch (err) {
+    next(err);
+  }
+};
+exports.postDealChat = async (req, res, next) => {
+  try {
+    const dealId = req.params.id;
+    const deal = await Deal.findByIdAndUpdate(dealId , {chat:req.body.chat}, { new: true });
+    if (!deal)  throw new createError("Deal is not found");
+    res.status(200).send(deal.chat);
+  } catch (err) {
+    next(err);
+  }
+};
+
+
 exports.cancelDeal = async (req, res, next) => {
   try {
     const dealId = req.params.id;

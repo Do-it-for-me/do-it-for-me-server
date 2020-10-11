@@ -42,6 +42,10 @@ const DealSchema = new Schema({
   note: {
     type: String,
   },
+  chat: {
+    type: Array,
+    default:[],
+  }
 });
 
 DealSchema.method("toJSON", function () {
@@ -56,6 +60,7 @@ DealSchema.method("toJSON", function () {
     time: this.time,
     note: this.note,
     rated: this.rated,
+    chat:this.chat,
   };
 });
 

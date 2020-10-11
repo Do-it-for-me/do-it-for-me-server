@@ -5,6 +5,8 @@ const {
   addDeal,
   confirmDeal,
   cancelDeal,
+  getDealChat,
+  postDealChat,
 } = require("../controllers/DealsController");
 
 //ready
@@ -19,5 +21,8 @@ router.route("/").post(authorizeToken, addDeal);
 router.route("/:id/confirm").put(authorizeToken, confirmDeal);
 
 router.route("/:id/cancel").put(authorizeToken, cancelDeal);
+router.route("/:id/chat").get(authorizeToken, getDealChat);
+router.route("/:id/chat").put(authorizeToken, postDealChat);
+
 
 module.exports = router;
