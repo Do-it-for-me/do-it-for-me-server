@@ -77,6 +77,10 @@ const UserSchema = new Schema(
       type: Number,
       default: 0,
     },
+    rate:{
+      type: Number,
+      default: 0,
+    }
   },
   {
     toJSON: {
@@ -85,15 +89,16 @@ const UserSchema = new Schema(
     toObject: {
       virtuals: true,
     },
+
   }
 );
 
 UserSchema.virtual("fullName").get(function () {
   return `${this.firstName} ${this.lastName}`;
 });
-UserSchema.virtual("rate").get(function () {
+/* UserSchema.virtual("rate").get(function () {
   return Math.round(this.totalRate / this.rateCounter) / 2 || 0;
-});
+}); */
 
 // Automatically hash the provided clear-text password before a User is saved
 // We can run a Mongoose hook to automatically do that

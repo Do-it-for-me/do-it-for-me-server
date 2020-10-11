@@ -237,11 +237,15 @@ exports.rateProvider = async (req, res, next) => {
       );
     await Deal.findByIdAndUpdate(dealId, { rated: true });
 
+        const newCalculatedRate = Math.round((Number(ratedUserTotalRate + Number(newRate)) / (Number(ratedUser.rateCounter + 1)) / 2)) || 0;
+
+
     const userAfterRate = await User.findByIdAndUpdate(
       ratedUserId,
       {
         totalRate: ratedUserTotalRate + Number(newRate),
         rateCounter: ratedUser.rateCounter + 1,
+        rate: newCalculatedRate
       },
       { new: true }
     );
