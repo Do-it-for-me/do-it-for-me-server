@@ -35,6 +35,7 @@ exports.getUsers = async (req, res, next) => {
     };
   }
   queryObject["availability.endDate"] = { $gte: queryDate };
+  console.log(queryObject)
   try {
     const users = await User.find(queryObject).populate("services");
     console.log(queryObject);
