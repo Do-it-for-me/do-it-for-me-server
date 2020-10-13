@@ -244,9 +244,9 @@ exports.rateProvider = async (req, res, next) => {
     const newCalculatedRate =
       Math.round(
         Number(ratedUserTotalRate + Number(newRate)) /
-          Number(ratedUser.rateCounter + 1) /
+          Number(ratedUser.rateCounter + 1)) /
           2
-      ) || 0;
+       || 0;
 
     const userAfterRate = await User.findByIdAndUpdate(
       ratedUserId,
