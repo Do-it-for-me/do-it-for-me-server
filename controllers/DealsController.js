@@ -29,7 +29,8 @@ exports.getDeals = async (req, res, next) => {
       "-email -city -street -zip -services -availability -bio"
     )
     .populate("dealService");
-
+      deals.providerList.reverse()
+      deals.searcherList.reverse()
   res.status(200).send(deals);
 };
 
