@@ -1,11 +1,7 @@
 const createError = require("http-errors");
 
 exports.throw400 = (req, res, next) => {
-  // We create an error and attach the status code
-  // const error = new Error('No such resource');
-  // error.status = 400;
   const error = new createError.BadRequest();
-  // We next() the error so the error handler middleware runs
   next(error);
 };
 

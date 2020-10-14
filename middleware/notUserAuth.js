@@ -1,5 +1,3 @@
-const createError = require("http-errors");
-
 const authorizeUser = async (req, res, next) => {
   try {
     if (

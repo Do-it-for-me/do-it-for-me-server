@@ -15,12 +15,12 @@ const setCORS = require("./middleware/setCORS");
 const { throw400, handleErrors } = require("./middleware/errors");
 const env = require("./config/environment");
 
-// Initialization
+
 const app = express();
-// Initialize Mongoose
+
 
 mongoose
-  // .connect('mongodb://127.0.0.1:27017/record-shop', {
+  
   .connect(env.db, {
     useNewUrlParser: true,
     useCreateIndex: true,

@@ -1,10 +1,7 @@
-const mongoose = require("mongoose");
-const createError = require("http-errors");
-const moment = require("moment");
 
+const createError = require("http-errors");
 const Deal = require("../models/Deal");
-const config = require("../config/environment");
-const { check } = require("../lib/encryption");
+
 
 exports.getDeals = async (req, res, next) => {
   let deals = { searcherList: undefined, providerList: undefined };
@@ -36,14 +33,11 @@ exports.getDeals = async (req, res, next) => {
 
 exports.addDeal = async (req, res, next) => {
   try {
-    // const newUser = new User(req.body);
+    
     if (String(req.user._id) === String(req.body.provider))
       throw new createError("You can not book yourself");
     const newDeal = new Deal({ ...req.body, searcher: req.user._id });
-    /* if (req.user._id !== req.body.searcher)
-      throw new createError.NotAcceptable(
-        "The deal Creator should be logged in user"
-      ); */
+    
     await newDeal.save();
     res.status(201).send(newDeal);
   } catch (err) {

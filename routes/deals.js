@@ -5,13 +5,11 @@ const {
   addDeal,
   confirmDeal,
   cancelDeal,
-} = require("../controllers/DealsController");
+} = require("../controllers/dealsController");
 
-//ready
+
 const authorizeToken = require("../middleware/tokenAuth");
 
-//to be edited
-const validator = require("../middleware/validator");
 
 router.route("/").get(authorizeToken, getDeals);
 router.route("/").post(authorizeToken, addDeal);

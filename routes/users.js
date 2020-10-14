@@ -23,14 +23,11 @@ const {
 const validator = require("../middleware/validator");
 const authorizeToken = require("../middleware/tokenAuth");
 const authorizeUser = require("../middleware/userAuth");
-//const authorizeAdmin = require("../middleware/adminAuth");
 const addUserRules = require("../lib/validation/addUser");
 const putUserRules = require("../lib/validation/putUser");
 const notUserAuth = require("../middleware/notUserAuth");
 
-// Protect routes by running authToken middleware before the controllers
-// Make sure only admins have permission by plugging in another middleware which checks for proper role
-router.route("/").get(/* authorizeToken, authorizeAdmin, */ getUsers);
+router.route("/").get(getUsers);
 
 router.route("/signup").post(validator(addUserRules), addUser);
 

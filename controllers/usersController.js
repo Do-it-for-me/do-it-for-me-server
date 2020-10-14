@@ -3,14 +3,11 @@ const createError = require("http-errors");
 const moment = require("moment");
 
 const User = require("../models/User");
-/* const { check } = require("../lib/encryption"); */
 const Deal = require("../models/Deal");
 const config = require("../config/environment");
 
 exports.getUsers = async (req, res, next) => {
-  const queryObject = {
-    /* availability: {} */
-  };
+  const queryObject = {};
 
   if (req.query.city)
     queryObject.city = req.query.city.replace(/(?:^|\s|[-"'([{])+\S/g, (c) =>
@@ -28,17 +25,15 @@ exports.getUsers = async (req, res, next) => {
       $gte: queryRate,
     };
   }
-  let queryDate = moment(req.query.date).format("YYYY-MM-DD");
-  if (req.query.date) {
-    queryObject["availability.startDate"] = {
-      $lte: queryDate,
-    };
-  }
+  let queryDate = req.query.date ? moment(req.query.date).format("YYYY-MM-DD") : moment().format("YYYY-MM-DD");
+  queryObject["availability.startDate"] = {
+    $lte: queryDate,
+  };
   queryObject["availability.endDate"] = { $gte: queryDate };
-  console.log(queryObject)
+  
   try {
     const users = await User.find(queryObject).populate("services");
-    console.log(queryObject);
+    
     res.status(200).send(users);
   } catch (err) {
     next(err);
@@ -47,26 +42,11 @@ exports.getUsers = async (req, res, next) => {
 
 exports.addUser = async (req, res, next) => {
   try {
-    // const newUser = new User(req.body);
+    
     const newUser = new User({ ...req.body, role: "user" });
     await newUser.save();
     const token = await newUser.generateAuthToken();
-    /* console.log("newUser", newUser);
-    const addedUser = await User.find({ email: req.body.email });
-    console.log("addedUser", addedUser);
-    if (addedUser) {
-      res.cookie("loggedIn", true, {
-        expires: new Date(Date.now() + 604800000),
-        httpOnly: false,
-      });
-      res
-        .cookie("X-Auth-Token", token, {
-          expires: new Date(Date.now() + 604800000),
-          httpOnly: true,
-        })
-        .status(201)
-        .send(newUser);
-    } */
+    
     res
       .cookie("loggedIn", true, {
         expires: new Date(Date.now() + 604800000),
@@ -88,7 +68,6 @@ exports.addUser = async (req, res, next) => {
       .send(newUser)
       .populate("services");
   } catch (err) {
-    if (err.code === 11000) console.log("it works");
     console.log(err);
     next(err);
   }
@@ -99,7 +78,7 @@ exports.getUser = async (req, res, next) => {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) throw new createError.NotFound();
     const user = await User.findById(id).populate("services");
-    // .select('-password');
+    
 
     if (!user) throw new createError.NotFound();
     if (req.canSeeFullUser) res.status(200).send(user);
@@ -161,23 +140,21 @@ exports.deleteUser = async (req, res, next) => {
 
 exports.loginUser = async (req, res, next) => {
   const { email, password } = req.body;
+
   try {
-    // Check if user with the given email exists
     const loginUser = await User.findOne({ email }).populate("services");
-    // If email doesn't exist, throw an error
+    
     if (!loginUser)
       throw new createError.Unauthorized(
         "Your email or password was incorrect! Please try again"
       );
     const isAuthenticated = await loginUser.authenticate(password);
-    // If password doesn't match, throw an error
+    
     if (!isAuthenticated)
       throw new createError.Unauthorized(
         "Your email or password was incorrect! Please try again"
       );
-    // Since password match, create a JWT token and save it with the user
     const token = await loginUser.generateAuthToken();
-    // Send the token to the client so they can access protected routes
     res.cookie("loggedIn", true, {
       expires: new Date(Date.now() + 604800000),
       httpOnly: false,
@@ -194,18 +171,7 @@ exports.loginUser = async (req, res, next) => {
   }
 };
 
-/* const search = {
-    city:
-      (req.query.city &&
-        req.query.city.replace(/(?:^|\s|[-"'([{])+\S/g, (c) =>
-          c.toUpperCase()
-        )) ||
-      "Berlin",
-    services: req.query.services || { $exists: true, $not: { $size: 0 } },
-    price: req.query.price || null,
-    rate: req.query.rate || null,
-  };
-  console.log(search); */
+
 
 exports.rateProvider = async (req, res, next) => {
   try {
@@ -217,7 +183,7 @@ exports.rateProvider = async (req, res, next) => {
     const dealDate = moment(deal.dealDate).format("YYYY-MM-DD");
     const todayDate = moment().format("YYYY-MM-DD");
     const newRate = Number(req.body.rate) * 2;
-    console.log("ratedUserTotalRate", ratedUserTotalRate);
+    
     if (String(deal.searcher) !== String(req.user._id))
       throw new createError("You are not part of this deal");
     if (String(deal.provider) !== String(ratedUserId))
